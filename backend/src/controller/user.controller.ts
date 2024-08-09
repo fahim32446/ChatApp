@@ -8,11 +8,9 @@ export const getUserInfo = async (req: Request, res: Response) => {
     _id: { $ne: loggedInUserId },
   }).select('-password');
 
-  res.status(200).json(filteredUsers);
-
   return {
     success: true,
     data: filteredUsers,
-    message: 'Login user info',
+    message: 'Other user data',
   };
 };

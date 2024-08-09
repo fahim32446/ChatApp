@@ -11,8 +11,8 @@ const signupValidators = [
   body('fullName').notEmpty().withMessage('Full name is required'),
   body('username').notEmpty().withMessage('Username is required'),
   body('password')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long'),
+    .isLength({ min: 5 })
+    .withMessage('Password must be at least 5 characters long'),
   body('confirmPassword')
     .notEmpty()
     .withMessage('Confirm password is required'),

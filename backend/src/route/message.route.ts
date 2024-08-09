@@ -8,7 +8,7 @@ import { getMessages, sendMessage } from '../controller/message.controller';
 const messageRoutes = express.Router();
 
 messageRoutes.get(
-  '/id',
+  '/:id',
   protectRoute,
   wrapAsync([], async (req: Request, res: Response) => {
     const data = (await getMessages(req, res)) as DataResponse;

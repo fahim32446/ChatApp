@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Conversation from '../models/conversation.model';
 import Message from '../models/message.model';
+import { getReceiverSocketId, io } from '../utils/socket';
 
 export const sendMessage = async (req: Request, res: Response) => {
   const { message } = req.body;
@@ -34,13 +35,12 @@ export const sendMessage = async (req: Request, res: Response) => {
   await Promise.all([conversation.save(), newMessage.save()]);
 
   // SOCKET IO FUNCTIONALITY WILL GO HERE
-  //   const receiverSocketId = getReceiverSocketId(receiverId);
-  //   if (receiverSocketId) {
-  //     // io.to(<socket_id>).emit() used to send events to specific client
-  //     io.to(receiverSocketId).emit('newMessage', newMessage);
-  //   }
+  const receiverSocketId = getReceiverSocketId(receiverId);
 
-  res.status(201).json(newMessage);
+  if (receiverSocketId) {
+    // io.to(<socket_id>).emit() used to send events to specific client
+    io.to(receiverSocketId).emit('newMessage', newMessage);
+  }
 
   return {
     success: true,
@@ -54,16 +54,15 @@ export const getMessages = async (req: Request, res: Response) => {
 
   const conversation = await Conversation.findOne({
     participants: { $all: [senderId, userToChatId] },
-  }).populate('messages'); // NOT REFERENCE BUT ACTUAL MESSAGES
+  }).populate('messages');
 
   if (!conversation) return res.status(200).json([]);
 
   const messages = conversation.messages;
 
-  res.status(200).json(messages);
-
   return {
     success: true,
     data: messages,
+    message: 'Messages',
   };
 };

@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { Request, Response } from 'express';
 import User from '../models/user.model';
 import generateTokenAndSetCookie from '../utils/libs';
+import jwt from 'jsonwebtoken';
 
 export const signup = async (req: Request, res: Response) => {
   const { fullName, username, password, confirmPassword, gender } = req.body;
@@ -65,11 +66,16 @@ export const login = async (req: Request, res: Response) => {
 
   generateTokenAndSetCookie(user._id, res);
 
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, {
+    expiresIn: '15d',
+  });
+
   const data = {
     _id: user._id,
     fullName: user.fullName,
     username: user.username,
     profilePic: user.profilePic,
+    token,
   };
 
   return {
